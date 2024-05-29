@@ -7,14 +7,14 @@ const client  = new Client({ intents: GatewayIntentBits.Guilds})
  client.commands = new Collection();
 client.commandArray = [];
 
-const functionFolders = fs.readdirSync('./src/functions');
+const functionFolders = fs.readdirSync(`./src/functions`);
 const functionFiles = fs
 for (const folder of functionFolders) {
     const functionFiles = fs.readdirSync(`./src/functions/${folder}`).filter(file => file.endsWith('.js'));
-for (const functionFile of functionFiles) require(`./src/functions/${folder}/${file}`)(client);
+for (const functionFile of functionFiles) require(`./src/functions/${folder}/${functionFile}`)(client);
     
 }
-lient.handleEvents()
+client.handleEvents()
 client.handleCommands();
 
 client.login(token)
