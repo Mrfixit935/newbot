@@ -1,18 +1,41 @@
-const fs = require('fs');
-
+const fs = require("fs");
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 
 module.exports = (client) => {
-    client.handleCommands = async() => {
-const commandsFolder = fs.readdirSync('./src/commands');
-for (const folder of commandsFolder) {
-    const commandsFiles = fs.readdirSync(`./src/commands/${folder}`).filter(file => file).filter(file => file.endsWith('.js'));
-    const { commands, commandArray } = client;
-    for (const commandFile of commandsFiles) {
-        const command = require(`../../commands/${folder}/${commandFile}`);
-        client.commands.set(command.data.name, command);
-        commandArray.push(command.data.toJson());
-        console.log(`Command: ${command.data.name} has been loaded `);
-    } 
+    client.handleCommands = async () => {
+      const commandsFolder = fs.readdirSync("./src/commands");
+      for (const folder of commandsFolder) {
+        const commandsFiles = fs
+         .readdirSync(`./src/commands/${folder}`)
+         .filter((file) => file.endsWith(".js"));
+        const { commands, commandArray } = client;
+        for (const file of commandsFiles) {
+          const command = require(`../../commands/${folder}/${file}`);
+          commands.set(command.data.name, command);
+     if (command.data && typeof command.data.toJson === 'function') {
+
+         client.commandArray.push(command.data.toJson());
+          console.log(`Command: ${command.data.name} has been loaded `);
+        }
+      }
+      const clientId = "1078055722459336734";
+      const guildId = "1077722465763074079";
+      const rest = new REST({ version: "9" }).setToken(process.env.token);
+      try {
+        console.log(`Started refreshing application (/) commands.`);
+  
+        // The put method is used to fully refresh all commands in the guild with the current set
+        const data = await rest.put(
+          Routes.applicationGuildCommands(clientId, guildId),
+          { body: client.commandArray }
+        );
+  
+        console.log(`Successfully reloaded application (/) commands.`);
+      } catch (error) {
+        // And of course, make sure you catch and log any errors!
+        console.error(error);
+      }
+    };
 }
-    }
 }
