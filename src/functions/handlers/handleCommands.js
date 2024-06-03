@@ -1,5 +1,5 @@
 const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
+const { Routes } = require('discord-api-types/v10');
 const fs = require("fs");
 
 
@@ -14,6 +14,7 @@ module.exports = (client) => {
         const { commands, commandArray } = client;
         for (const file of commandsFiles) {
           const command = require(`../../commands/${folder}/${file}`);
+          console.log(command?.data.name ? `Command "${command?.data.name}" has passed through the command handler.` : `Malformed command detected!\n\n${command?.data ? Object.entries(command.data).map(entry => `"${entry[0]}": ${entry[1]}`).join("\n") : "\tN/A"}`);
           commands.set(command.data.name, command);
        // commandArray.push(command.data.toJson());
        if (command.data && typeof command.data.toJson === 'function') {
@@ -23,7 +24,7 @@ module.exports = (client) => {
       const clientId = "1078055722459336734";
       const guildId = "1077722465763074079";
       const { token } = process.env;
-      const rest = new REST({ version: "9" }).setToken(token);
+      const rest = new REST({ version: "10" }).setToken(token);
       try {
         console.log(`Started refreshing application (/) commands.`);
   
